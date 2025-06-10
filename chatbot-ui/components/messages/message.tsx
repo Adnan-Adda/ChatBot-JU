@@ -67,7 +67,6 @@ export const Message: FC<MessageProps> = ({
         // Send feedback to your backend or log it
         console.log(`Feedback for ${messageId}: ${type}`);
 
-        // Example: Send to API
         await fetch('/api/feedback', {
             method: 'POST',
             headers: {
@@ -75,6 +74,9 @@ export const Message: FC<MessageProps> = ({
             },
             body: JSON.stringify({messageId, type}),
         });
+
+        // Store feedback in local storage
+        localStorage.setItem(`feedback_${messageId}`, type);
     };
 
     const FeedbackButtons = ({message, handleFeedback}: {
@@ -82,6 +84,14 @@ export const Message: FC<MessageProps> = ({
         handleFeedback: (id: string, type: 'like' | 'dislike') => void;
     }) => {
         const [feedbackGiven, setFeedbackGiven] = useState<'like' | 'dislike' | null>(null);
+
+        // Load feedback from local storage on mount
+        useEffect(() => {
+            const storedFeedback = localStorage.getItem(`feedback_${message.id}`);
+            if (storedFeedback === 'like' || storedFeedback === 'dislike') {
+                setFeedbackGiven(storedFeedback);
+            }
+        }, [message.id]);
 
         const handleClick = (type: 'like' | 'dislike') => {
             if (feedbackGiven === null) {
@@ -94,14 +104,26 @@ export const Message: FC<MessageProps> = ({
             <div className="flex space-x-2 mt-2">
                 <button
                     onClick={() => handleClick('like')}
-                    className={`transition ${feedbackGiven === 'like' ? 'text-green-500' : 'text-gray-500 hover:text-green-500'}`}
+                    className={`transition-colors duration-200 ${
+                        feedbackGiven === 'like'
+                            ? 'text-green-500 cursor-default'
+                            : feedbackGiven === 'dislike'
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-500 hover:text-green-500'
+                    }`}
                     disabled={feedbackGiven !== null}
                 >
                     <ThumbsUp size={18}/>
                 </button>
                 <button
                     onClick={() => handleClick('dislike')}
-                    className={`transition ${feedbackGiven === 'dislike' ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
+                    className={`transition-colors duration-200 ${
+                        feedbackGiven === 'dislike'
+                            ? 'text-red-500 cursor-default'
+                            : feedbackGiven === 'like'
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-500 hover:text-red-500'
+                    }`}
                     disabled={feedbackGiven !== null}
                 >
                     <ThumbsDown size={18}/>
@@ -109,7 +131,6 @@ export const Message: FC<MessageProps> = ({
             </div>
         ) : null;
     };
-
 
     const {handleSendMessage} = useChatHandler()
 
