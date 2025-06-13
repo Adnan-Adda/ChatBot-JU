@@ -63,17 +63,46 @@ export const Message: FC<MessageProps> = ({
         models
     } = useContext(ChatbotUIContext)
 
-    const handleFeedback = async (messageId: string, type: 'like' | 'dislike') => {
-        // Send feedback to your backend or log it
-        console.log(`Feedback for ${messageId}: ${type}`);
+    /*===================================Handle Feedback=========================================================*/
 
-        await fetch('/api/feedback', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({messageId, type}),
-        });
+    const handleFeedback = async (messageId: string, type: 'like' | 'dislike') => {
+        const assistantWrapper = chatMessages.find(m => m.message.id === messageId);
+        const assistantMessage = assistantWrapper?.message;
+
+        if (!assistantMessage || assistantMessage.role !== 'assistant') return;
+
+        const userWrapper = [...chatMessages]
+            .map(m => m.message)
+            .reverse()
+            .find(m => m.role === 'user' && m.sequence_number < assistantMessage.sequence_number);
+
+        const query = userWrapper?.content || 'Unknown';
+
+        try {
+            const res = await fetch("http://localhost:4000/feedback", {
+                method: "POST",
+                headers: {
+                    "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    user: profile?.id || "anonymous",
+                    query: query,
+                    answer: message.content,
+                    feedback: type === "like" ? 0 : 1,
+                    llm_type: message.model || "Undefined",
+                }),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                console.log("RealityCheck with feedback result:", data.message);
+            } else {
+                console.error("RealityCheck with feedback error:", data);
+            }
+        } catch (err) {
+            console.error("RealityCheck with feedback API call failed:", err);
+        }
 
         // Store feedback in local storage
         localStorage.setItem(`feedback_${messageId}`, type);
@@ -83,6 +112,7 @@ export const Message: FC<MessageProps> = ({
         message: Tables<"messages">;
         handleFeedback: (id: string, type: 'like' | 'dislike') => void;
     }) => {
+
         const [feedbackGiven, setFeedbackGiven] = useState<'like' | 'dislike' | null>(null);
 
         // Load feedback from local storage on mount
