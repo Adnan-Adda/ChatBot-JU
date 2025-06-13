@@ -3,6 +3,7 @@ import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
+import { supabase } from "@/lib/supabase/server-client"
 
 export const runtime = "edge"
 
@@ -30,6 +31,11 @@ export async function POST(request: Request) {
       max_tokens:
         CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
       stream: true
+    })
+
+    await supabase.from("llm_usage_log").insert({
+    model_id: chatSettings.model,
+    used_at: new Date().toISOString(),
     })
 
     // Convert the response into a friendly text-stream.

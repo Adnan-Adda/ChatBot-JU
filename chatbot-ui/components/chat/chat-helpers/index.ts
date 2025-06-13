@@ -4,6 +4,7 @@ import { createChatFiles } from "@/db/chat-files"
 import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
 import { createMessages, updateMessage } from "@/db/messages"
+import { supabase } from "@/lib/supabase/browser-client"
 import { uploadMessageImage } from "@/db/storage/message-images"
 import {
   buildFinalMessages,
@@ -173,6 +174,15 @@ export const handleLocalChat = async (
     setIsGenerating,
     setChatMessages
   )
+  const { error } = await supabase.from("llm_usage_log").insert({
+    model_id: chatSettings.model,
+    used_at: new Date().toISOString(),
+  })
+  if (error) {
+    console.error("Failed to log LLM usage (local chat):", error)
+  } else {
+      console.log("Logged LLM usage (local chat):", chatSettings.model)
+  }
 
   return await processResponse(
     response,

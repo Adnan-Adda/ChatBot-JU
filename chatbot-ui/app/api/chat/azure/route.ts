@@ -3,6 +3,7 @@ import { ChatAPIPayload } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+import { supabase } from "@/lib/supabase/server-client"
 
 export const runtime = "edge"
 
@@ -59,6 +60,11 @@ export async function POST(request: Request) {
       stream: true
     })
 
+
+    await supabase.from("llm_usage_log").insert({
+    model_id: chatSettings.model,
+    used_at: new Date().toISOString(),
+    })
     const stream = OpenAIStream(response)
 
     return new StreamingTextResponse(stream)
