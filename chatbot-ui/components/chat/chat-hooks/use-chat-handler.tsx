@@ -66,7 +66,8 @@ export const useChatHandler = () => {
         models,
         isPromptPickerOpen,
         isFilePickerOpen,
-        isToolPickerOpen
+        isToolPickerOpen,
+        setRealityCheckScores
     } = useContext(ChatbotUIContext)
 
     const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -381,46 +382,78 @@ export const useChatHandler = () => {
             )
 
             // ---------------- Reality Check Integration ----------------
-            // const assessLLMAnswer = async (
-            //     userId: string,
-            //     query: string,
-            //     answer: string,
-            //     llmType: string
-            // ) => {
-            //     try {
-            //         const res = await fetch("http://localhost:4000/assess", {
-            //             method: "POST",
-            //             headers: {
-            //                 "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
-            //                 "Content-Type": "application/json",
-            //             },
-            //             body: JSON.stringify({
-            //                 user: userId,
-            //                 query,
-            //                 answer,
-            //                 llm_type: llmType,
-            //             }),
-            //         });
-            //
-            //         const data = await res.json();
-            //
-            //         if (res.ok) {
-            //             console.log("RealityCheck result (wrongness probability):", data.result);
-            //             // Optionally store or display this result
-            //         } else {
-            //             console.error("RealityCheck error:", data);
-            //         }
-            //     } catch (err) {
-            //         console.error("RealityCheck API call failed:", err);
+            const assessLLMAnswer = async (
+                userId: string,
+                query: string,
+                answer: string,
+                llmType: string
+            ): Promise<number | null> => {
+                try {
+                    const res = await fetch("http://localhost:4000/assess", {
+                        method: "POST",
+                        headers: {
+                            "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            user: userId,
+                            query,
+                            answer,
+                            llm_type: llmType,
+                        }),
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        console.log("RealityCheck result (wrongness probability):", data.result);
+                        return data.result;
+                    } else {
+                        console.error("RealityCheck error:", data);
+                        return null;
+                    }
+                } catch (err) {
+                    console.error("RealityCheck API call failed:", err);
+                    return null;
+                }
+            };
+
+            const score = await assessLLMAnswer(
+                profile?.id || "anonymous",
+                messageContent,
+                generatedText,
+                chatSettings?.model || "Undefined"
+            );
+
+
+            // // Store by last assistant message ID
+            // if (chatMessages.length > 0) {
+            //     const lastAssistantMsg = [...chatMessages].reverse().find(m => m.message.role === 'assistant');
+            //     if (lastAssistantMsg?.message?.id) {
+            //         setRealityCheckScores(prev => ({
+            //             ...prev,
+            //             [lastAssistantMsg.message.id]: Number(score)
+            //         }));
             //     }
-            // };
-            //
-            // await assessLLMAnswer(
-            //     profile?.id || "anonymous",
-            //     messageContent,
-            //     generatedText,
-            //     chatSettings?.model || "Undefined"
-            // );
+            // }
+            const latestAssistant = [...chatMessages]
+                .concat({
+                    message: {
+                        ...tempAssistantChatMessage.message,
+                        content: generatedText
+                    },
+                    fileItems: []
+                })
+                .reverse()
+                .find(m => m.message.role === 'assistant');
+
+            if (latestAssistant?.message?.id) {
+                setRealityCheckScores(prev => ({
+                    ...prev,
+                    // [latestAssistant.message.id]: Number(score)
+                    [`${latestAssistant.message.sequence_number}`]: Number(score)
+                }));
+            }
 // -----------------------------------------------------------
 
             setIsGenerating(false)
