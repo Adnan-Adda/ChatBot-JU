@@ -60,11 +60,53 @@ export const Message: FC<MessageProps> = ({
         assistantImages,
         toolInUse,
         files,
-        models
+        models,
+        realityCheckScores
     } = useContext(ChatbotUIContext)
 
     /*===================================Handle Feedback=========================================================*/
+    // const [realityCheckScore, setRealityCheckScore] = useState<number | null>(null);
+    // useEffect(() => {
+    //     const fetchRealityCheck = async () => {
+    //         if (message.role !== 'assistant' || realityCheckScore !== null) return;
+    //
+    //         const userMessage = [...chatMessages]
+    //             .map(m => m.message)
+    //             .reverse()
+    //             .find(m => m.role === 'user' && m.sequence_number < message.sequence_number);
+    //
+    //         if (!userMessage) return;
+    //
+    //         try {
+    //             const res = await fetch("http://localhost:4000/assess", {
+    //                 method: "POST",
+    //                 headers: {
+    //                     "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
+    //                     "Content-Type": "application/json",
+    //                 },
+    //                 body: JSON.stringify({
+    //                     user: profile?.id || "anonymous",
+    //                     query: userMessage.content,
+    //                     answer: message.content,
+    //                     llm_type: message.model || "Undefined",
+    //                 }),
+    //             });
+    //
+    //             const data = await res.json();
+    //             if (res.ok) {
+    //                 setRealityCheckScore(data.result);
+    //             } else {
+    //                 console.error("RealityCheck error:", data);
+    //             }
+    //         } catch (err) {
+    //             console.error("RealityCheck API call failed:", err);
+    //         }
+    //     };
+    //
+    //     fetchRealityCheck();
+    // }, [message, realityCheckScore]);
 
+    const score = realityCheckScores[`${message.sequence_number}`];
     const handleFeedback = async (messageId: string, type: 'like' | 'dislike') => {
         const assistantWrapper = chatMessages.find(m => m.message.id === messageId);
         const assistantMessage = assistantWrapper?.message;
@@ -158,9 +200,56 @@ export const Message: FC<MessageProps> = ({
                 >
                     <ThumbsDown size={18}/>
                 </button>
+                {message.role === 'assistant' && score !== undefined && (
+                    <div className="mt-2">
+                        <RealityCheckWheel score={score}/>
+                    </div>
+                )}
             </div>
         ) : null;
     };
+
+    const RealityCheckWheel = ({score}: { score: number }) => {
+        const radius = 15;
+        const stroke = 2;
+        const normalizedRadius = radius - stroke * 0.5;
+        const circumference = normalizedRadius * 2 * Math.PI;
+        const strokeDashoffset = circumference - score * circumference;
+
+        return (
+            <div className="relative w-[30px] h-[30px]">
+                <svg
+                    height={radius * 2}
+                    width={radius * 2}
+                    className="rotate-[-90deg]"
+                >
+                    <circle
+                        stroke="#e5e7eb"
+                        fill="transparent"
+                        strokeWidth={stroke}
+                        r={normalizedRadius}
+                        cx={radius}
+                        cy={radius}
+                    />
+                    <circle
+                        stroke="#2436d4"
+                        fill="transparent"
+                        strokeWidth={stroke}
+                        strokeDasharray={circumference + " " + circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        r={normalizedRadius}
+                        cx={radius}
+                        cy={radius}
+                    />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium ">
+                    {(score * 100).toFixed(0)}
+                </div>
+            </div>
+        );
+    };
+
 
     const {handleSendMessage} = useChatHandler()
 
