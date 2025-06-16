@@ -1,0 +1,6 @@
+# install
+npm init -y
+npm install express cors
+
+# run
+node server.js
