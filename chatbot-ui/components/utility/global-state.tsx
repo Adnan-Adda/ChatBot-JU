@@ -123,6 +123,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
   const [toolInUse, setToolInUse] = useState<string>("none")
 
+    const [realityCheckScores, setRealityCheckScores] = useState<Record<string, number>>({})
+
+
   useEffect(() => {
     ;(async () => {
       const profile = await fetchStartingData()
@@ -322,7 +325,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         selectedTools,
         setSelectedTools,
         toolInUse,
-        setToolInUse
+        setToolInUse,
+          realityCheckScores,
+        setRealityCheckScores
       }}
     >
       {children}
