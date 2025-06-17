@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39 50" width="39" height="50">
+	<title>Ju_logo</title>
+	<defs>
+		<image  width="39" height="50" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACcAAAAyAQMAAADldlBeAAAAAXNSR0IB2cksfwAAAAZQTFRFAAAA////pdmf3QAAAAJ0Uk5TAP9bkSK1AAAAbElEQVR4nGNkYGD+85+RgYH9B4jk/4Cf/ItE/gSSQAAnISIwWUKm/WeYUAAiLxggyA8C1CX/opD1DTDyJ6P9ARj5kVH+AYjk//BB4CEj+48PAgcZmf98EGhkZPz3QYCRkaG+gJeFkUH+AqMAANiCd7078wgfAAAAAElFTkSuQmCC"/>
+	</defs>
+	<style>
+	</style>
+	<use id="Background" href="#img1" x="0" y="0"/>
+</svg>

@@ -13,6 +13,7 @@ import { FC, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
+import { LLMUsageScoreboard } from "../stats/llm-usage-scoreboard"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -227,7 +228,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
 
                 {selectedPreset?.name ||
                   selectedAssistant?.name ||
-                  t("Quick Settings")}
+                  t("Leader Board")}
               </div>
 
               <IconChevronDown className="ml-1" />
@@ -302,6 +303,9 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
               ))}
           </>
         )}
+        <div className="border-t pt-2">
+          <LLMUsageScoreboard />
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   )
