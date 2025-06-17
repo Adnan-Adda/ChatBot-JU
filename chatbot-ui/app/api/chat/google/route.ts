@@ -1,6 +1,7 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { supabase } from "@/lib/supabase/server-client"
 
 export const runtime = "edge"
 
@@ -28,6 +29,10 @@ export async function POST(request: Request) {
       }
     })
 
+    await supabase.from("llm_usage_log").insert({
+    model_id: chatSettings.model,
+    used_at: new Date().toISOString(),
+    })
     const response = await chat.sendMessageStream(lastMessage.parts)
 
     const encoder = new TextEncoder()

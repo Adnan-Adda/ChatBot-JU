@@ -3,6 +3,7 @@ import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
+import { supabase } from "@/lib/supabase/server-client"
 
 export const runtime = "edge"
 export async function POST(request: Request) {
@@ -21,6 +22,11 @@ export async function POST(request: Request) {
     const groq = new OpenAI({
       apiKey: profile.groq_api_key || "",
       baseURL: "https://api.groq.com/openai/v1"
+    })
+
+    await supabase.from("llm_usage_log").insert({
+    model_id: chatSettings.model,
+    used_at: new Date().toISOString(),
     })
 
     const response = await groq.chat.completions.create({

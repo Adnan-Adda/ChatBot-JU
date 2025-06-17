@@ -672,6 +672,24 @@ export type Database = {
           },
         ]
       }
+      llm_usage_log: {
+        Row: {
+          id: string
+          model_id: string
+          used_at: string | null
+        }
+        Insert: {
+          id?: string
+          model_id: string
+          used_at?: string | null
+        }
+        Update: {
+          id?: string
+          model_id?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       message_file_items: {
         Row: {
           created_at: string

@@ -5,6 +5,7 @@ import { ChatSettings } from "@/types"
 import Anthropic from "@anthropic-ai/sdk"
 import { AnthropicStream, StreamingTextResponse } from "ai"
 import { NextRequest, NextResponse } from "next/server"
+import { supabase } from "@/lib/supabase/server-client"
 
 export const runtime = "edge"
 
@@ -55,6 +56,11 @@ export async function POST(request: NextRequest) {
       }
     )
 
+    await supabase.from("llm_usage_log").insert({
+    model_id: chatSettings.model,
+    used_at: new Date().toISOString(),
+    })
+    
     const anthropic = new Anthropic({
       apiKey: profile.anthropic_api_key || ""
     })

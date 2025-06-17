@@ -1,6 +1,7 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
+import { supabase } from "@/lib/supabase/server-client"
 import OpenAI from "openai"
 
 export const runtime = "edge"
@@ -27,6 +28,11 @@ export async function POST(request: Request) {
       model: chatSettings.model,
       messages,
       stream: true
+    })
+
+    await supabase.from("llm_usage_log").insert({
+    model_id: chatSettings.model,
+    used_at: new Date().toISOString(),
     })
 
     const stream = OpenAIStream(response)
