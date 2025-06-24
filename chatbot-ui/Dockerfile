@@ -1,19 +1,29 @@
-# Step 1: Use Node.js base image
-FROM node:20-alpine
+# Use a stable Node.js base image
+FROM node:20
 
-# Step 2: Set working directory
+# Set working directory
 WORKDIR /app
 
-# Step 3: Install dependencies
-COPY package.json package-lock.json ./
+# Copy environment variables (optional, only if needed during build)
+COPY .env.local .env.local
+
+# Copy dependency definitions
+COPY package*.json ./
+
+# Install dependencies
 RUN npm ci
 
-# Step 4: Copy rest of the project
+# Copy all source code
 COPY . .
 
-# Step 5: Build the Next.js app
-RUN npm run build
+# Set DNS fix for some alpine/docker setups
+ENV NODE_OPTIONS=--dns-result-order=ipv4first
 
-# Step 6: Expose port and run
+# Build the app
+RUN npx next build
+
+# Expose port
 EXPOSE 3000
+
+# Start the app
 CMD ["npm", "start"]

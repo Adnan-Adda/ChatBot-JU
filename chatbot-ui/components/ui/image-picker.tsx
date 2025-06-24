@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { ChangeEvent, FC, useState } from "react"
-import { toast } from "@/components/ui/sonner"
+import { toast } from "sonner"
 import { Input } from "./input"
 
 interface ImagePickerProps {
