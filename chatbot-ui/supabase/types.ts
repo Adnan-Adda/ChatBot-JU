@@ -676,17 +676,17 @@ export type Database = {
         Row: {
           id: string
           model_id: string
-          used_at: string | null
+          used_at: string
         }
         Insert: {
           id?: string
-          model_id: string
-          used_at?: string | null
+          model_id?: string
+          used_at?: string
         }
         Update: {
           id?: string
           model_id?: string
-          used_at?: string | null
+          used_at?: string
         }
         Relationships: []
       }

@@ -290,3 +290,12 @@ We are working on a guide for contributing.
 ## Contact
 
 Message Mckay on [Twitter/X](https://twitter.com/mckaywrigley)
+
+
+## Docker 
+
+Create: docker build --network=host -t chatbot-ui:latest .
+Run: docker run -it --rm -p 3000:3000 --network=host chatbot-ui:latest
+
+Create: docker build --network=host -t mock-api:latest .
+Run: docker run -it --rm -p 3000:3000 --network=host mock-api:latest

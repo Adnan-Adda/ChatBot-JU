@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+README.md
+dist
+*.log
+.husky
+.vscode
+.nvmrc
+__tests__
+*.test.*
+*.spec.*
