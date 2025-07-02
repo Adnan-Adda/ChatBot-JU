@@ -25,15 +25,21 @@ export async function POST(request: Request) {
       organization: profile.openai_organization_id
     })
 
+    const MAX_TOKEN_LIMITS: Record<string, number> = {
+      "gpt-4": 2048,
+      "gpt-4-1106-preview": 4096,
+      "gpt-4-vision-preview": 4096,
+      "gpt-4o": 4096,
+      "gpt-3.5-turbo": 1024
+    }
+
+    const maxTokens = MAX_TOKEN_LIMITS[chatSettings.model] || 2048
+
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens:
-        chatSettings.model === "gpt-4-vision-preview" ||
-        chatSettings.model === "gpt-4o"
-          ? 4096
-          : null, // TODO: Fix
+      max_tokens: maxTokens,
       stream: true
     })
 

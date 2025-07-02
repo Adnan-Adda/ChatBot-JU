@@ -306,6 +306,10 @@ ssh deividas@jth-ai-01.hj.se
 ssh -L 3000:localhost:3000  adnan@jth-ai-01.hj.se
 ssh -L 3000:localhost:3000  deividas@jth-ai-01.hj.se
 
+ssh -L 3000:localhost:3000 -L 54321:localhost:54321 -L 8000:localhost:8000  adnan@jth-ai-01.hj.se
+ssh -L 3000:localhost:3000 -L 54321:localhost:54321 -L 8000:localhost:8000  deividas@jth-ai-01.hj.se
+
+
          API URL: http://127.0.0.1:54321
      GraphQL URL: http://127.0.0.1:54321/graphql/v1
   S3 Storage URL: http://127.0.0.1:54321/storage/v1/s3

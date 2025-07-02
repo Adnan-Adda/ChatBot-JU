@@ -3,6 +3,7 @@ import { fetchLLMusageStats } from "@/db/stats";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/browser-client";
 
+
 export const LLMUsageScoreboard = () => {
     const [scoreboard, setScoreboard] = useState<{ model: string; usage_count: number }[]>([])
     const [loading, setLoading] = useState(false)
