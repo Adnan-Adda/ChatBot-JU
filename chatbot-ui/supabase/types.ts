@@ -686,7 +686,7 @@ export type Database = {
         Update: {
           id?: string
           model_id?: string
-          used_at?: string
+          used_at?: string | null
         }
         Relationships: []
       }
@@ -785,6 +785,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      model_usage_feedback: {
+        Row: {
+          model_id: string
+          thumbdown: number
+          thumbup: number
+        }
+        Insert: {
+          model_id: string
+          thumbdown?: number
+          thumbup?: number
+        }
+        Update: {
+          model_id?: string
+          thumbdown?: number
+          thumbup?: number
+        }
+        Relationships: []
       }
       model_workspaces: {
         Row: {

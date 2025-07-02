@@ -45,3 +45,18 @@ export const fetchLLMusageStats = async () => {
 
     return scoreboard
 }
+
+export const fetchThumbsStats = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("model_usage_feedback")
+      .select("model_id, thumbup, thumbdown");
+
+    if (error) throw error;
+
+    return data; // array of { model_id, thumbup, thumbdown }
+  } catch (err) {
+    console.error("Failed to fetch thumbs stats:", err);
+    return [];
+  }
+};
