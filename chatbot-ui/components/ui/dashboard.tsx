@@ -99,8 +99,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       </div>
 
       <div
-        className="bg-[#262626] relative flex w-screen min-w-[90%] grow flex-col sm:min-w-fit"
-        onDrop={onFileDrop}
+        className="relative flex w-screen min-w-[90%] grow flex-col sm:min-w-fit bg-white dark:bg-[#262626]"        onDrop={onFileDrop}
         onDragOver={onDragOver}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
