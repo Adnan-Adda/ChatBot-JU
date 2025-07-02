@@ -680,7 +680,7 @@ export type Database = {
         }
         Insert: {
           id?: string
-          model_id?: string
+          model_id: string
           used_at?: string
         }
         Update: {
@@ -785,6 +785,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      model_usage_feedback: {
+        Row: {
+          model_id: string
+          thumbdown: number
+          thumbup: number
+        }
+        Insert: {
+          model_id: string
+          thumbdown?: number
+          thumbup?: number
+        }
+        Update: {
+          model_id?: string
+          thumbdown?: number
+          thumbup?: number
+        }
+        Relationships: []
       }
       model_workspaces: {
         Row: {
@@ -1327,6 +1345,10 @@ export type Database = {
       delete_storage_object_from_bucket: {
         Args: { bucket_name: string; object_path: string }
         Returns: Record<string, unknown>
+      }
+      increment_column: {
+        Args: { model: string; col: string }
+        Returns: undefined
       }
       match_file_items_local: {
         Args: {
