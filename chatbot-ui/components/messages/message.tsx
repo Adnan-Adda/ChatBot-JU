@@ -24,6 +24,8 @@ import {WithTooltip} from "../ui/with-tooltip"
 import {MessageActions} from "./message-actions"
 import {MessageMarkdown} from "./message-markdown"
 import {ThumbsUp, ThumbsDown} from 'lucide-react';
+import {createClient} from "@/lib/supabase/client";
+
 
 const ICON_SIZE = 32
 
@@ -65,46 +67,7 @@ export const Message: FC<MessageProps> = ({
     } = useContext(ChatbotUIContext)
 
     /*===================================Handle Feedback=========================================================*/
-    // const [realityCheckScore, setRealityCheckScore] = useState<number | null>(null);
-    // useEffect(() => {
-    //     const fetchRealityCheck = async () => {
-    //         if (message.role !== 'assistant' || realityCheckScore !== null) return;
-    //
-    //         const userMessage = [...chatMessages]
-    //             .map(m => m.message)
-    //             .reverse()
-    //             .find(m => m.role === 'user' && m.sequence_number < message.sequence_number);
-    //
-    //         if (!userMessage) return;
-    //
-    //         try {
-    //             const res = await fetch("http://localhost:4000/assess", {
-    //                 method: "POST",
-    //                 headers: {
-    //                     "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
-    //                     "Content-Type": "application/json",
-    //                 },
-    //                 body: JSON.stringify({
-    //                     user: profile?.id || "anonymous",
-    //                     query: userMessage.content,
-    //                     answer: message.content,
-    //                     llm_type: message.model || "Undefined",
-    //                 }),
-    //             });
-    //
-    //             const data = await res.json();
-    //             if (res.ok) {
-    //                 setRealityCheckScore(data.result);
-    //             } else {
-    //                 console.error("RealityCheck error:", data);
-    //             }
-    //         } catch (err) {
-    //             console.error("RealityCheck API call failed:", err);
-    //         }
-    //     };
-    //
-    //     fetchRealityCheck();
-    // }, [message, realityCheckScore]);
+    const supabase = createClient();
 
     const score = realityCheckScores[`${message.sequence_number}`];
     const handleFeedback = async (messageId: string, type: 'like' | 'dislike') => {
@@ -146,6 +109,42 @@ export const Message: FC<MessageProps> = ({
             console.error("RealityCheck with feedback API call failed:", err);
         }
 
+        const incrementThumb = async (
+            modelId: string,
+            column: 'thumbup' | 'thumbdown'
+        ) => {
+            try {
+                // 1. Ensure the row exists using upsert (no increment yet)
+                const {error: upsertError} = await supabase
+                    .from('model_usage_feedback')
+                    .upsert(
+                        [{model_id: modelId}],
+                        {
+                            onConflict: 'model_id',
+                            ignoreDuplicates: false, // optional, default behavior
+                        }
+                    );
+
+                if (upsertError) throw upsertError;
+
+                // 2. Atomically increment using the stored procedure
+                const {error: rpcError} = await supabase.rpc('increment_column', {
+                    model: modelId,
+                    col: column,
+                });
+
+                if (rpcError) throw rpcError;
+
+                console.log(`Incremented ${column} for model_id: ${modelId}`);
+            } catch (error) {
+                console.error('Failed to upsert/increment thumbs:', error);
+            }
+        };
+
+        const columnToIncrement = type === "like" ? "thumbup" : "thumbdown";
+        const modelId = assistantMessage.model;
+        await incrementThumb(modelId, columnToIncrement);
+
         // Store feedback in local storage
         localStorage.setItem(`feedback_${messageId}`, type);
     };
@@ -169,6 +168,7 @@ export const Message: FC<MessageProps> = ({
             if (feedbackGiven === null) {
                 handleFeedback(message.id, type);
                 setFeedbackGiven(type);
+
             }
         };
 
