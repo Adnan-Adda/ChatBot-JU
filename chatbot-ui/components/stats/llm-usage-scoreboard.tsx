@@ -42,6 +42,7 @@ import {useEffect, useState} from "react";
 import {ThumbsUp, ThumbsDown} from "lucide-react";
 
 
+
 export const LLMUsageScoreboard = () => {
     const [scoreboard, setScoreboard] = useState<{
         model: string;

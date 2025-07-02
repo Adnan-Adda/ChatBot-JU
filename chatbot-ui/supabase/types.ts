@@ -680,13 +680,13 @@ export type Database = {
         }
         Insert: {
           id?: string
-          model_id: string
+          model_id?: string
           used_at?: string
         }
         Update: {
           id?: string
           model_id?: string
-          used_at?: string
+          used_at?: string | null
         }
         Relationships: []
       }
@@ -1345,10 +1345,6 @@ export type Database = {
       delete_storage_object_from_bucket: {
         Args: { bucket_name: string; object_path: string }
         Returns: Record<string, unknown>
-      }
-      increment_column: {
-        Args: { model: string; col: string }
-        Returns: undefined
       }
       match_file_items_local: {
         Args: {
