@@ -5,7 +5,6 @@ This is a customized chatbot tailored for Jönköping's University. The UI inclu
 Every QA pair is sent to a reality check API which responds back with an assessment score that indicates how factually correct the response is.
 
 ## UI  
-[▶️ Watch demo video](chatbot-ui/chatbot-ju-edit.mp4)
 ![Demo](chatbot-ui/chatbot-ju.gif)
 
 In order to get the reaclity check you need to change the endpoint to the actual one.
