@@ -680,13 +680,34 @@ export type Database = {
         }
         Insert: {
           id?: string
-          model_id?: string
+          model_id: string
           used_at?: string
         }
         Update: {
           id?: string
           model_id?: string
-          used_at?: string | null
+          used_at?: string
+        }
+        Relationships: []
+      }
+      llm_user_log: {
+        Row: {
+          token_count: number
+          updated_at: string
+          usage_month: string
+          user_id: string
+        }
+        Insert: {
+          token_count?: number
+          updated_at?: string
+          usage_month: string
+          user_id: string
+        }
+        Update: {
+          token_count?: number
+          updated_at?: string
+          usage_month?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -785,24 +806,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      model_usage_feedback: {
-        Row: {
-          model_id: string
-          thumbdown: number
-          thumbup: number
-        }
-        Insert: {
-          model_id: string
-          thumbdown?: number
-          thumbup?: number
-        }
-        Update: {
-          model_id?: string
-          thumbdown?: number
-          thumbup?: number
-        }
-        Relationships: []
       }
       model_workspaces: {
         Row: {
