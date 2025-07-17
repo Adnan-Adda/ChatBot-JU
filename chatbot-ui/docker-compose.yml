@@ -1,11 +1,46 @@
-version: '3.9'
+networks:
+  supabase_network_chatbotui:
+    driver: bridge
 
 services:
-  web:
-    build: .
+  ollama:
+    image: ollama/ollama
+    container_name: ollama-container
     ports:
-      - "3000:3000"
+      - "11434:11434"
     environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+      - OLLAMA_ORIGINS=http://jth-ai-01.hj.se:3000
+    networks:
+      - supabase_network_chatbotui
+    volumes:
+      - ollama-data:/root/.ollama
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      ollama serve &
+      sleep 5 &&
+      ollama pull llama3 &&
+      ollama pull mistral || true &&
+      wait
+
+  ui:
+    image: chatbot-ui:latest
+    container_name: ui-container
+    networks:
+      - supabase_network_chatbotui
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - supabase_network_chatbotui
+    depends_on:
+      - ollama
+      - ui
+    restart: on-failure
+
+volumes:
+  ollama-data:
