@@ -84,7 +84,7 @@ export const Message: FC<MessageProps> = ({
         const query = userWrapper?.content || 'Unknown';
 
         try {
-            const res = await fetch("http://localhost:4000/feedback", {
+            const res = await fetch(`${process.env.REALITY_CHECK_URL}/feedback`, {
                 method: "POST",
                 headers: {
                     "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
@@ -148,6 +148,13 @@ export const Message: FC<MessageProps> = ({
         // Store feedback in local storage
         localStorage.setItem(`feedback_${messageId}`, type);
     };
+    // Delete this when we have functional reality check
+    const getRandomScore = (): number => {
+        const scoreList = Array.from({length: 10}, (_, i) => i / 10); // [0.0, 0.1, ..., 0.9]
+        const randomIndex = Math.floor(Math.random() * scoreList.length);
+        return scoreList[randomIndex];
+    };
+
 
     const FeedbackButtons = ({message, handleFeedback}: {
         message: Tables<"messages">;
@@ -202,7 +209,7 @@ export const Message: FC<MessageProps> = ({
                 </button>
                 {message.role === 'assistant' && score !== undefined && (
                     <div className="mt-2">
-                        <RealityCheckWheel score={score}/>
+                        <RealityCheckWheel score={getRandomScore()}/>
                     </div>
                 )}
             </div>
@@ -211,10 +218,18 @@ export const Message: FC<MessageProps> = ({
 
     const RealityCheckWheel = ({score}: { score: number }) => {
         const radius = 15;
-        const stroke = 2;
+        const stroke = 3;
         const normalizedRadius = radius - stroke * 0.5;
         const circumference = normalizedRadius * 2 * Math.PI;
         const strokeDashoffset = circumference - score * circumference;
+
+        // Determine outer ring color based on score
+        let outerStrokeColor = "#ef4444"; // red-500
+        if (score > 0.66) {
+            outerStrokeColor = "#22c55e"; // green-500
+        } else if (score > 0.33) {
+            outerStrokeColor = "#eab308"; // yellow-500
+        }
 
         return (
             <div className="relative w-[30px] h-[30px]">
@@ -224,7 +239,7 @@ export const Message: FC<MessageProps> = ({
                     className="rotate-[-90deg]"
                 >
                     <circle
-                        stroke="#e5e7eb"
+                        stroke={outerStrokeColor}
                         fill="transparent"
                         strokeWidth={stroke}
                         r={normalizedRadius}
@@ -235,7 +250,7 @@ export const Message: FC<MessageProps> = ({
                         stroke="#2436d4"
                         fill="transparent"
                         strokeWidth={stroke}
-                        strokeDasharray={circumference + " " + circumference}
+                        strokeDasharray={`${circumference} ${circumference}`}
                         strokeDashoffset={strokeDashoffset}
                         strokeLinecap="round"
                         r={normalizedRadius}
@@ -243,7 +258,7 @@ export const Message: FC<MessageProps> = ({
                         cy={radius}
                     />
                 </svg>
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium ">
+                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
                     {(score * 100).toFixed(0)}
                 </div>
             </div>

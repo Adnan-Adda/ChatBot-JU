@@ -1,5 +1,5 @@
 # ChatBot-JU  
-Custom chatbot for Jönköping's University
+Custom chatbot for Jönköping's University made by Adnan Al medawer and Deividas Malaska.
 
 This is a customized chatbot tailored for Jönköping's University. The UI includes feedback buttons for each response from the chatbot (thumb up/down). When the user clicks on the feedback button, the feedback is collected and sent along with the query to an API for collecting feedbacks.  
 Every QA pair is sent to a reality check API which responds back with an assessment score that indicates how factually correct the response is.
