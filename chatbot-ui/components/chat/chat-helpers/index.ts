@@ -288,6 +288,71 @@ export const fetchChatResponse = async (
   return response
 }
 
+// export const processResponse = async (
+//   response: Response,
+//   lastChatMessage: ChatMessage,
+//   isHosted: boolean,
+//   controller: AbortController,
+//   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+//   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+//   setToolInUse: React.Dispatch<React.SetStateAction<string>>
+// ) => {
+//   let fullText = ""
+//   let contentToAdd = ""
+//
+//   if (response.body) {
+//     await consumeReadableStream(
+//       response.body,
+//       chunk => {
+//         setFirstTokenReceived(true)
+//         setToolInUse("none")
+//
+//         try {
+//           contentToAdd = isHosted
+//             ? chunk
+//             : // Ollama's streaming endpoint returns new-line separated JSON
+//               // objects. A chunk may have more than one of these objects, so we
+//               // need to split the chunk by new-lines and handle each one
+//               // separately.
+//               chunk
+//                 .trimEnd()
+//                 .split("\n")
+//                 .reduce(
+//                   (acc, line) => acc + JSON.parse(line).message.content,
+//                   ""
+//                 )
+//           fullText += contentToAdd
+//         } catch (error) {
+//           console.error("Error parsing JSON:", error)
+//         }
+//
+//         setChatMessages(prev =>
+//           prev.map(chatMessage => {
+//             if (chatMessage.message.id === lastChatMessage.message.id) {
+//               const updatedChatMessage: ChatMessage = {
+//                 message: {
+//                   ...chatMessage.message,
+//                   content: fullText
+//                 },
+//                 fileItems: chatMessage.fileItems
+//               }
+//
+//               return updatedChatMessage
+//             }
+//
+//             return chatMessage
+//           })
+//         )
+//       },
+//       controller.signal
+//     )
+//
+//     return fullText
+//   } else {
+//     throw new Error("Response body is null")
+//   }
+// }
+
 export const processResponse = async (
   response: Response,
   lastChatMessage: ChatMessage,
@@ -298,60 +363,64 @@ export const processResponse = async (
   setToolInUse: React.Dispatch<React.SetStateAction<string>>
 ) => {
   let fullText = ""
-  let contentToAdd = ""
+  let buffer = ""
 
-  if (response.body) {
-    await consumeReadableStream(
-      response.body,
-      chunk => {
-        setFirstTokenReceived(true)
-        setToolInUse("none")
-
-        try {
-          contentToAdd = isHosted
-            ? chunk
-            : // Ollama's streaming endpoint returns new-line separated JSON
-              // objects. A chunk may have more than one of these objects, so we
-              // need to split the chunk by new-lines and handle each one
-              // separately.
-              chunk
-                .trimEnd()
-                .split("\n")
-                .reduce(
-                  (acc, line) => acc + JSON.parse(line).message.content,
-                  ""
-                )
-          fullText += contentToAdd
-        } catch (error) {
-          console.error("Error parsing JSON:", error)
-        }
-
-        setChatMessages(prev =>
-          prev.map(chatMessage => {
-            if (chatMessage.message.id === lastChatMessage.message.id) {
-              const updatedChatMessage: ChatMessage = {
-                message: {
-                  ...chatMessage.message,
-                  content: fullText
-                },
-                fileItems: chatMessage.fileItems
-              }
-
-              return updatedChatMessage
-            }
-
-            return chatMessage
-          })
-        )
-      },
-      controller.signal
-    )
-
-    return fullText
-  } else {
+  if (!response.body) {
     throw new Error("Response body is null")
   }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+
+  while (true) {
+    const { value, done } = await reader.read()
+    if (done) break
+
+    const chunk = decoder.decode(value, { stream: true })
+    setFirstTokenReceived(true)
+    setToolInUse("none")
+
+    if (isHosted) {
+      // hosted models return plain string
+      fullText += chunk
+    } else {
+      // local models return NDJSON (newline-delimited JSON)
+      buffer += chunk
+
+      const lines = buffer.split("\n")
+      buffer = lines.pop() || "" // incomplete line stays in buffer
+
+      for (const line of lines) {
+        try {
+          const json = JSON.parse(line)
+          const token = json?.message?.content || json?.content || json?.token || ""
+          fullText += token
+
+          // update assistant message
+          setChatMessages(prev =>
+            prev.map(chatMessage => {
+              if (chatMessage.message.id === lastChatMessage.message.id) {
+                return {
+                  ...chatMessage,
+                  message: {
+                    ...chatMessage.message,
+                    content: fullText
+                  }
+                }
+              }
+              return chatMessage
+            })
+          )
+        } catch (err) {
+          console.error("Error parsing JSON chunk:", line, err)
+        }
+      }
+    }
+  }
+
+  return fullText
 }
+
 
 export const handleCreateChat = async (
   chatSettings: ChatSettings,
