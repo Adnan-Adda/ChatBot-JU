@@ -84,7 +84,7 @@ export const Message: FC<MessageProps> = ({
         const query = userWrapper?.content || 'Unknown';
 
         try {
-            const res = await fetch(`${process.env.REALITY_CHECK_URL}/feedback`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_REALITY_CHECK_URL}/feedback`, {
                 method: "POST",
                 headers: {
                     "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
@@ -148,13 +148,6 @@ export const Message: FC<MessageProps> = ({
         // Store feedback in local storage
         localStorage.setItem(`feedback_${messageId}`, type);
     };
-    // Delete this when we have functional reality check
-    const getRandomScore = (): number => {
-        const scoreList = Array.from({length: 10}, (_, i) => i / 10); // [0.0, 0.1, ..., 0.9]
-        const randomIndex = Math.floor(Math.random() * scoreList.length);
-        return scoreList[randomIndex];
-    };
-
 
     const FeedbackButtons = ({message, handleFeedback}: {
         message: Tables<"messages">;
@@ -209,7 +202,7 @@ export const Message: FC<MessageProps> = ({
                 </button>
                 {message.role === 'assistant' && score !== undefined && (
                     <div className="mt-2">
-                        <RealityCheckWheel score={getRandomScore()}/>
+                        <RealityCheckWheel score={score}/>
                     </div>
                 )}
             </div>
@@ -225,9 +218,9 @@ export const Message: FC<MessageProps> = ({
 
         // Determine outer ring color based on score
         let outerStrokeColor = "#ef4444"; // red-500
-        if (score > 0.66) {
+        if (score > 0.8) {
             outerStrokeColor = "#22c55e"; // green-500
-        } else if (score > 0.33) {
+        } else if (score > 0.2) {
             outerStrokeColor = "#eab308"; // yellow-500
         }
 
