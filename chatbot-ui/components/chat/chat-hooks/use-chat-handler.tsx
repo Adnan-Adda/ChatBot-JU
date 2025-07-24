@@ -389,7 +389,7 @@ export const useChatHandler = () => {
                 llmType: string
             ): Promise<number | null> => {
                 try {
-                    const res = await fetch(`${process.env.REALITY_CHECK_URL}/assess`, {
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_REALITY_CHECK_URL}/assess`, {
                         method: "POST",
                         headers: {
                             "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
