@@ -209,55 +209,73 @@ export const Message: FC<MessageProps> = ({
         ) : null;
     };
 
-    const RealityCheckWheel = ({score}: { score: number }) => {
-        const radius = 15;
-        const stroke = 3;
-        const normalizedRadius = radius - stroke * 0.5;
-        const circumference = normalizedRadius * 2 * Math.PI;
-        const strokeDashoffset = circumference - score * circumference;
+    // const RealityCheckWheel = ({score}: { score: number }) => {
+    //     const isRedActive = score > 0.8;
+    //     const isYellowActive = score >= 0.2 && score <= 0.8;
+    //     const isGreenActive = score < 0.2;
+    //     const getOpacityClass = (isActive: boolean) => {
+    //         return isActive ? 'opacity-100' : 'opacity-25';
+    //     };
+    //
+    //     return (
+    //         <div className="flex items-center justify-center space-x-1 bg-gray-800 p-1 rounded-full shadow-lg">
+    //             <div
+    //                 role="img"
+    //                 aria-label="Red Light"
+    //                 className={`w-6 h-6 bg-red-500 rounded-full transition-opacity duration-500 ease-in-out ${getOpacityClass(isRedActive)}`}
+    //             >
+    //             </div>
+    //             <div
+    //                 role="img"
+    //                 aria-label="Yellow Light"
+    //                 className={`w-6 h-6 bg-yellow-500 rounded-full transition-opacity duration-500 ease-in-out ${getOpacityClass(isYellowActive)}`}
+    //             >
+    //             </div>
+    //             <div
+    //                 role="img"
+    //                 aria-label="Green Light"
+    //                 className={`w-6 h-6 bg-green-500 rounded-full transition-opacity duration-500 ease-in-out ${getOpacityClass(isGreenActive)}`}
+    //             >
+    //             </div>
+    //         </div>
+    //     );
+    // };
 
-        // Determine outer ring color based on score
-        let outerStrokeColor = "#ef4444"; // red-500
-        if (score > 0.8) {
-            outerStrokeColor = "#22c55e"; // green-500
-        } else if (score > 0.2) {
-            outerStrokeColor = "#eab308"; // yellow-500
-        }
+
+    const RealityCheckWheel = ({score}: { score: number }) => {
+        const isRedActive = score > 0.8;
+        const isYellowActive = score >= 0.2 && score <= 0.8;
+        const isGreenActive = score < 0.2;
 
         return (
-            <div className="relative w-[30px] h-[30px]">
-                <svg
-                    height={radius * 2}
-                    width={radius * 2}
-                    className="rotate-[-90deg]"
+            <div className="flex items-center justify-center space-x-1 bg-gray-800 p-1 rounded-full shadow-lg">
+                <div
+                    role="img"
+                    aria-label="Red Light"
+                    className={`w-6 h-6 bg-red-500 rounded-full transition-all duration-500 ease-in-out ${
+                        isRedActive ? 'opacity-100 shadow-[0_0_12px_4px_rgba(239,68,68,0.7)]' : 'opacity-25'
+                    }`}
                 >
-                    <circle
-                        stroke={outerStrokeColor}
-                        fill="transparent"
-                        strokeWidth={stroke}
-                        r={normalizedRadius}
-                        cx={radius}
-                        cy={radius}
-                    />
-                    <circle
-                        stroke="#2436d4"
-                        fill="transparent"
-                        strokeWidth={stroke}
-                        strokeDasharray={`${circumference} ${circumference}`}
-                        strokeDashoffset={strokeDashoffset}
-                        strokeLinecap="round"
-                        r={normalizedRadius}
-                        cx={radius}
-                        cy={radius}
-                    />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                    {(score * 100).toFixed(0)}
+                </div>
+                <div
+                    role="img"
+                    aria-label="Yellow Light"
+                    className={`w-6 h-6 bg-yellow-400 rounded-full transition-all duration-500 ease-in-out ${
+                        isYellowActive ? 'opacity-100 shadow-[0_0_12px_4px_rgba(250,204,21,0.7)]' : 'opacity-25'
+                    }`}
+                >
+                </div>
+                <div
+                    role="img"
+                    aria-label="Green Light"
+                    className={`w-6 h-6 bg-green-500 rounded-full transition-all duration-500 ease-in-out ${
+                        isGreenActive ? 'opacity-100 shadow-[0_0_12px_4px_rgba(34,197,94,0.7)]' : 'opacity-25'
+                    }`}
+                >
                 </div>
             </div>
         );
     };
-
 
     const {handleSendMessage} = useChatHandler()
 
