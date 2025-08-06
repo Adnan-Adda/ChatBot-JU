@@ -687,7 +687,6 @@ export type Database = {
           id?: string
           model_id?: string
           used_at?: string
-<<<<<<< HEAD
         }
         Relationships: []
       }
@@ -709,8 +708,6 @@ export type Database = {
           updated_at?: string
           usage_month?: string
           user_id?: string
-=======
->>>>>>> 17c4af6facf7bf2d2c4b6481ec86ed46137520df
         }
         Relationships: []
       }
@@ -1351,10 +1348,6 @@ export type Database = {
       delete_storage_object_from_bucket: {
         Args: { bucket_name: string; object_path: string }
         Returns: Record<string, unknown>
-      }
-      increment_column: {
-        Args: { model: string; col: string }
-        Returns: undefined
       }
       match_file_items_local: {
         Args: {

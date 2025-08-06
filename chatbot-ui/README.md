@@ -306,3 +306,4 @@ ssh deividas@jth-ai-01.hj.se
 ssh -L 3000:localhost:3000  adnan@jth-ai-01.hj.se
 ssh -L 3000:localhost:3000  deividas@jth-ai-01.hj.se
 
+/ChatBot-JU/chatbot-ui/lib/models/llm/openai-llm-list.ts ~ here you can add missing openai models. 
