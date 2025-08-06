@@ -209,37 +209,7 @@ export const Message: FC<MessageProps> = ({
         ) : null;
     };
 
-    // const RealityCheckWheel = ({score}: { score: number }) => {
-    //     const isRedActive = score > 0.8;
-    //     const isYellowActive = score >= 0.2 && score <= 0.8;
-    //     const isGreenActive = score < 0.2;
-    //     const getOpacityClass = (isActive: boolean) => {
-    //         return isActive ? 'opacity-100' : 'opacity-25';
-    //     };
-    //
-    //     return (
-    //         <div className="flex items-center justify-center space-x-1 bg-gray-800 p-1 rounded-full shadow-lg">
-    //             <div
-    //                 role="img"
-    //                 aria-label="Red Light"
-    //                 className={`w-6 h-6 bg-red-500 rounded-full transition-opacity duration-500 ease-in-out ${getOpacityClass(isRedActive)}`}
-    //             >
-    //             </div>
-    //             <div
-    //                 role="img"
-    //                 aria-label="Yellow Light"
-    //                 className={`w-6 h-6 bg-yellow-500 rounded-full transition-opacity duration-500 ease-in-out ${getOpacityClass(isYellowActive)}`}
-    //             >
-    //             </div>
-    //             <div
-    //                 role="img"
-    //                 aria-label="Green Light"
-    //                 className={`w-6 h-6 bg-green-500 rounded-full transition-opacity duration-500 ease-in-out ${getOpacityClass(isGreenActive)}`}
-    //             >
-    //             </div>
-    //         </div>
-    //     );
-    // };
+    const realityCheckInfo = "The current reality check score of the bot's response: green (Accurate), yellow (Warning), red (Inaccurate).";
 
 
     const RealityCheckWheel = ({score}: { score: number }) => {
@@ -247,35 +217,45 @@ export const Message: FC<MessageProps> = ({
         const isYellowActive = score >= 0.2 && score <= 0.8;
         const isGreenActive = score < 0.2;
 
+        const Light = ({
+                           color,
+                           isActive,
+                       }: {
+            color: 'red' | 'yellow' | 'green';
+            isActive: boolean;
+        }) => {
+            const baseColors = {
+                red: 'bg-red-500 shadow-[0_0_12px_4px_rgba(239,68,68,0.7)]',
+                yellow: 'bg-yellow-400 shadow-[0_0_12px_4px_rgba(250,204,21,0.7)]',
+                green: 'bg-green-500 shadow-[0_0_12px_4px_rgba(34,197,94,0.7)]',
+            };
+
+            return (
+                <div className="relative group">
+                    <div
+                        className={`w-6 h-6 rounded-full transition-all duration-500 ease-in-out ${baseColors[color]} ${
+                            isActive ? 'opacity-100' : 'opacity-25'
+                        }`}
+                    ></div>
+                    {isActive && (
+                        <div
+                            className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-64 px-3 py-2 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity text-center z-10 pointer-events-none">
+                            {realityCheckInfo}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         return (
             <div className="flex items-center justify-center space-x-1 bg-gray-800 p-1 rounded-full shadow-lg">
-                <div
-                    role="img"
-                    aria-label="Red Light"
-                    className={`w-6 h-6 bg-red-500 rounded-full transition-all duration-500 ease-in-out ${
-                        isRedActive ? 'opacity-100 shadow-[0_0_12px_4px_rgba(239,68,68,0.7)]' : 'opacity-25'
-                    }`}
-                >
-                </div>
-                <div
-                    role="img"
-                    aria-label="Yellow Light"
-                    className={`w-6 h-6 bg-yellow-400 rounded-full transition-all duration-500 ease-in-out ${
-                        isYellowActive ? 'opacity-100 shadow-[0_0_12px_4px_rgba(250,204,21,0.7)]' : 'opacity-25'
-                    }`}
-                >
-                </div>
-                <div
-                    role="img"
-                    aria-label="Green Light"
-                    className={`w-6 h-6 bg-green-500 rounded-full transition-all duration-500 ease-in-out ${
-                        isGreenActive ? 'opacity-100 shadow-[0_0_12px_4px_rgba(34,197,94,0.7)]' : 'opacity-25'
-                    }`}
-                >
-                </div>
+                <Light color="red" isActive={isRedActive}/>
+                <Light color="yellow" isActive={isYellowActive}/>
+                <Light color="green" isActive={isGreenActive}/>
             </div>
         );
     };
+
 
     const {handleSendMessage} = useChatHandler()
 
