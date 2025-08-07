@@ -200,7 +200,7 @@ export const Message: FC<MessageProps> = ({
                 >
                     <ThumbsDown size={18}/>
                 </button>
-                {message.role === 'assistant' && score !== undefined && (
+                {message.role === 'assistant' && score !== undefined  && !(isLast && isGenerating) && (
                     <div className="mt-2">
                         <RealityCheckWheel score={score}/>
                     </div>
