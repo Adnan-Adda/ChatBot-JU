@@ -8,17 +8,21 @@ import { supabase } from "@/lib/supabase/server-client"
 export const runtime = "edge"
 
 export async function POST(request: Request) {
+  console.log("inside azure/route.ts");
   const json = await request.json()
   const { chatSettings, messages } = json as ChatAPIPayload
 
   try {
+    
     const profile = await getServerProfile()
-
+    
     checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
 
     const ENDPOINT = profile.azure_openai_endpoint
     const KEY = profile.azure_openai_api_key
-
+    console.log(profile);
+    console.log(ENDPOINT)
+    console.log(KEY)
     let DEPLOYMENT_ID = ""
     switch (chatSettings.model) {
       case "gpt-3.5-turbo":

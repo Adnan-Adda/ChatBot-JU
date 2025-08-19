@@ -4,6 +4,7 @@ import { EnvKey } from "@/types/key-type"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 
 export async function GET() {
+  console.log("We are inside keys/route.ts");
   const envKeyMap: Record<string, VALID_ENV_KEYS> = {
     azure: VALID_ENV_KEYS.AZURE_OPENAI_API_KEY,
     openai: VALID_ENV_KEYS.OPENAI_API_KEY,

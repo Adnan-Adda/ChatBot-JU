@@ -119,7 +119,7 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
     <div className="mt-5">
       <div className="space-y-3">
         <Label className="flex items-center space-x-1">
-          <div>Temperature:</div>
+          <div>Creativity:</div>
 
           <div>{chatSettings.temperature}</div>
         </Label>
@@ -138,31 +138,7 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
         />
       </div>
 
-      <div className="mt-6 space-y-3">
-        <Label className="flex items-center space-x-1">
-          <div>Context Length:</div>
 
-          <div>{chatSettings.contextLength}</div>
-        </Label>
-
-        <Slider
-          value={[chatSettings.contextLength]}
-          onValueChange={contextLength => {
-            onChangeChatSettings({
-              ...chatSettings,
-              contextLength: contextLength[0]
-            })
-          }}
-          min={0}
-          max={
-            isCustomModel
-              ? models.find(model => model.model_id === chatSettings.model)
-                  ?.context_length
-              : MODEL_LIMITS.MAX_CONTEXT_LENGTH
-          }
-          step={1}
-        />
-      </div>
 
       <div className="mt-7 flex items-center space-x-2">
         <Checkbox
