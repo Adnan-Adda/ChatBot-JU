@@ -84,7 +84,7 @@ export const Message: FC<MessageProps> = ({
         const query = userWrapper?.content || 'Unknown';
 
         try {
-            const res = await fetch(`${process.env.REALITY_CHECK_URL}/feedback`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_REALITY_CHECK_URL}/feedback`, {
                 method: "POST",
                 headers: {
                     "x-api-key": process.env.NEXT_PUBLIC_REALITY_CHECK_API_KEY!,
@@ -148,13 +148,6 @@ export const Message: FC<MessageProps> = ({
         // Store feedback in local storage
         localStorage.setItem(`feedback_${messageId}`, type);
     };
-    // Delete this when we have functional reality check
-    const getRandomScore = (): number => {
-        const scoreList = Array.from({length: 10}, (_, i) => i / 10); // [0.0, 0.1, ..., 0.9]
-        const randomIndex = Math.floor(Math.random() * scoreList.length);
-        return scoreList[randomIndex];
-    };
-
 
     const FeedbackButtons = ({message, handleFeedback}: {
         message: Tables<"messages">;
@@ -207,60 +200,58 @@ export const Message: FC<MessageProps> = ({
                 >
                     <ThumbsDown size={18}/>
                 </button>
-                {message.role === 'assistant' && score !== undefined && (
+                {message.role === 'assistant' && score !== undefined  && !(isLast && isGenerating) && (
                     <div className="mt-2">
-                        <RealityCheckWheel score={getRandomScore()}/>
+                        <RealityCheckWheel score={score}/>
                     </div>
                 )}
             </div>
         ) : null;
     };
 
-    const RealityCheckWheel = ({score}: { score: number }) => {
-        const radius = 15;
-        const stroke = 3;
-        const normalizedRadius = radius - stroke * 0.5;
-        const circumference = normalizedRadius * 2 * Math.PI;
-        const strokeDashoffset = circumference - score * circumference;
+    const realityCheckInfo = "The current reality check score of the bot's response: green (Accurate), yellow (Warning), red (Inaccurate).";
 
-        // Determine outer ring color based on score
-        let outerStrokeColor = "#ef4444"; // red-500
-        if (score > 0.66) {
-            outerStrokeColor = "#22c55e"; // green-500
-        } else if (score > 0.33) {
-            outerStrokeColor = "#eab308"; // yellow-500
-        }
+
+    const RealityCheckWheel = ({score}: { score: number }) => {
+        const isRedActive = score > 0.8;
+        const isYellowActive = score >= 0.2 && score <= 0.8;
+        const isGreenActive = score < 0.2;
+
+        const Light = ({
+                           color,
+                           isActive,
+                       }: {
+            color: 'red' | 'yellow' | 'green';
+            isActive: boolean;
+        }) => {
+            const baseColors = {
+                red: 'bg-red-500 shadow-[0_0_12px_4px_rgba(239,68,68,0.7)]',
+                yellow: 'bg-yellow-400 shadow-[0_0_12px_4px_rgba(250,204,21,0.7)]',
+                green: 'bg-green-500 shadow-[0_0_12px_4px_rgba(34,197,94,0.7)]',
+            };
+
+            return (
+                <div className="relative group">
+                    <div
+                        className={`w-6 h-6 rounded-full transition-all duration-500 ease-in-out ${baseColors[color]} ${
+                            isActive ? 'opacity-100' : 'opacity-25'
+                        }`}
+                    ></div>
+                    {isActive && (
+                        <div
+                            className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-64 px-3 py-2 text-sm text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity text-center z-10 pointer-events-none">
+                            {realityCheckInfo}
+                        </div>
+                    )}
+                </div>
+            );
+        };
 
         return (
-            <div className="relative w-[30px] h-[30px]">
-                <svg
-                    height={radius * 2}
-                    width={radius * 2}
-                    className="rotate-[-90deg]"
-                >
-                    <circle
-                        stroke={outerStrokeColor}
-                        fill="transparent"
-                        strokeWidth={stroke}
-                        r={normalizedRadius}
-                        cx={radius}
-                        cy={radius}
-                    />
-                    <circle
-                        stroke="#2436d4"
-                        fill="transparent"
-                        strokeWidth={stroke}
-                        strokeDasharray={`${circumference} ${circumference}`}
-                        strokeDashoffset={strokeDashoffset}
-                        strokeLinecap="round"
-                        r={normalizedRadius}
-                        cx={radius}
-                        cy={radius}
-                    />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                    {(score * 100).toFixed(0)}
-                </div>
+            <div className="flex items-center justify-center space-x-1 bg-gray-800 p-1 rounded-full shadow-lg">
+                <Light color="red" isActive={isRedActive}/>
+                <Light color="yellow" isActive={isYellowActive}/>
+                <Light color="green" isActive={isGreenActive}/>
             </div>
         );
     };
