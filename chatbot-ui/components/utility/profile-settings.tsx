@@ -56,7 +56,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
-
+  
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const [isOpen, setIsOpen] = useState(false)
@@ -117,7 +117,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [openrouterAPIKey, setOpenrouterAPIKey] = useState(
     profile?.openrouter_api_key || ""
   )
-
+  console.log(profile)
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")

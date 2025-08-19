@@ -193,12 +193,12 @@ export default function SetupPage() {
             <APIStep
               openaiAPIKey={openaiAPIKey}
               openaiOrgID={openaiOrgID}
-              azureOpenaiAPIKey={azureOpenaiAPIKey}
-              azureOpenaiEndpoint={azureOpenaiEndpoint}
-              azureOpenai35TurboID={azureOpenai35TurboID}
-              azureOpenai45TurboID={azureOpenai45TurboID}
-              azureOpenai45VisionID={azureOpenai45VisionID}
-              azureOpenaiEmbeddingsID={azureOpenaiEmbeddingsID}
+              azureOpenaiAPIKey={"3a53eed61d464e6f99c7ca98f33003c4"}
+              azureOpenaiEndpoint={"https://swedencentral.api.cognitive.microsoft.com/"}
+              azureOpenai35TurboID={"gpt4o-ju-deployment"}
+              azureOpenai45TurboID={"gpt4o-ju-deployment"}
+              azureOpenai45VisionID={"gpt4o-ju-deployment"}
+              azureOpenaiEmbeddingsID={"embedding-ada-002"}
               anthropicAPIKey={anthropicAPIKey}
               googleGeminiAPIKey={googleGeminiAPIKey}
               mistralAPIKey={mistralAPIKey}

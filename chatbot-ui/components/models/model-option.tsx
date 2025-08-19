@@ -30,6 +30,15 @@ export const ModelOption: FC<ModelOptionProps> = ({ model, onSelect }) => {
               )}
             </div>
           )}
+
+          {model.provider === "ollama" && (
+            <div className="space-y-1 text-sm">
+              <div>
+                <span className="font-semibold">This is our local and private model</span>{" "}
+              </div>
+            </div>
+          )}
+                    
         </div>
       }
       side="bottom"
